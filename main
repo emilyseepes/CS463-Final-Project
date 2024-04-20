@@ -1,0 +1,133 @@
+#import tkinter modules
+from tkinter import *
+#import tkinter font modules
+from tkinter import font
+import random
+import base64
+
+#GUI Specifications:
+root = Tk()
+root.geometry("1200x6000")
+root.title("Cipher Encryption & Decrpytion")
+Tops = Frame(root, width=1600, relief=SUNKEN)
+Tops.pack(side=TOP)
+
+f1 = Frame(root, width=800, relief=SUNKEN)
+f1.pack(side=LEFT)
+
+#Labels for the Programs title and subtitle:
+#TITLE DOCUMENTATION:
+#   - Location on screen = [0,0] = Top of screen with a border of 10. 
+lblInfo = Label(Tops, font=("Times", 60, "bold"), text= "CS463 Course Project",
+                fg="white", bd=10, anchor='w')
+lblInfo.grid(row=0, column=0)
+
+#SUBTITLE DOCUMENTATION:
+#   - Location on screen = [1,0] = Below title with a border of 10. 
+lblInfo = Label(Tops, font=("Times", 40, "italic"), text= "By Emily Seepes",
+                fg="white", bd=10, anchor='w')
+lblInfo.grid(row=1, column=0)
+
+#Variables
+Msg = StringVar()
+key = StringVar()
+mode = StringVar()
+result = StringVar()
+
+# MESSAGE DOCUMENTATION:
+# Labeling of Title and Location of the Message label
+lblMsg = Label(f1, font=("Times", 20, "bold"), text = "Message", bd=16, anchor='w')
+lblMsg.grid(row=1, column=0)
+# What the message text will take:
+#   - a StringVar() Msg
+txtMsg = Entry(f1, font=("Times", 16), textvariable = Msg, bd=10,
+               insertwidth=4, bg="black", justify='right')
+txtMsg.grid(row=1, column=1)
+
+# KEY DOCUMENTATION:
+# Labeling the Title and Location of the Key label
+lblkey = Label(f1, font=("Times", 20, "bold"), text="Key", bd=16, anchor='w')
+lblkey.grid(row=2, column=0)
+# Takes in a StringVar() key
+txtkey = Entry(f1, font=("Times", 16), textvariable= key, bd=10,
+               insertwidth=4, bg="black", justify='right')
+txtkey.grid(row=2, column=1)
+
+# MODE DOCUMENTATION
+# Labeling the Title and Location of the Model label
+lblmode = Label(f1, font=("Times", 20, "bold"), text="Modes: Encrypts (e) or Decrypt (d)", 
+                bd=16, anchor='w')
+lblmode.grid(row=3, column=0)
+# Takes in a StringVar()) key
+txtmode = Entry(f1, font=("Times", 16), textvariable= mode, bd=10,
+               insertwidth=4, bg="black", justify='right')
+txtmode.grid(row=3, column=1)
+
+# RESULT DOCUMENTATION
+# Labeling the Title and Location of the Result label
+lblResult= Label(f1, font=("Times", 20, "bold"), text="Result", bd=16, anchor='w')
+lblResult.grid(row=2, column=2)
+#Takes in a StringVar() result
+txtresult = Entry(f1, font=("Times", 16), textvariable= result, bd=10,
+               insertwidth=4, bg="black", justify='right')
+txtresult.grid(row=2, column=3)
+
+# Encryption function will encrypt msg given a key.
+
+def encode(key, msg):
+    enc=[]
+    for i in range(len(msg)):
+        key_c = key[i%len(key)]
+        enc_c = chr((ord(msg[i])+ord(key_c))%256)
+        enc.append(enc_c)
+        
+    return base64.urlsafe_b64encode("".join(enc).encode()).decode()
+
+# Decryption function will decrypt the encrpyted msg given a key and enc msg.
+def decode(key, enc):
+    dec = []
+    enc = base64.urlsafe_b64decode(enc).decode()
+    for i in range(len(enc)):
+        key_c = key[i%len(key)]
+        dec_c = chr((256+ord(enc[i])-ord(key_c))%256)
+        
+        dec.append(dec_c)
+    return "".join(dec)
+
+# Results function: takes in user's input and assigns it to msg, k, and m.
+# If user inputs mode to be e for encryption, function calls encode.
+# If user inputs mode to something other than e, function calls decode function.
+def Results():
+    msg = Msg.get()
+    k = key.get()
+    m = mode.get()
+    if (m=='e'):
+        result.set(encode(k, msg))
+    else:
+        result.set(decode(k, msg))        
+# Reset function sets variables back to a blank string.
+def Reset():
+    Msg.set("")
+    key.set("")
+    mode.set("")
+# Exit function stops code and closes GUI.
+def Exit():
+    root.destroy()
+
+# Button for Showing Message: calls Results function
+btnResults = Button(f1, padx=16, pady=8, bd=16, fg="black",
+                  font=("Times", 20, "bold"), width=10,
+                  text="Show Message", bg="powder blue",
+                  command=Results).grid(row=7, column=1)
+# Button for Reset: calls Reset function
+btnReset= Button(f1, padx=16, pady=8, bd=16, fg="black",
+                  font=("Times", 20, "bold"), width=10,
+                  text="Reset", bg="powder blue",
+                  command=Reset).grid(row=7, column=2)
+# Button for Exit: calls Exit function
+btnExit = Button(f1, padx=16, pady=8, bd=16, fg="black",
+                  font=("Times", 20, "bold"), width=10,
+                  text="Exit", bg="powder blue",
+                  command=Exit).grid(row=7, column=3)
+
+root.mainloop()
